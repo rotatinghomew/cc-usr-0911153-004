@@ -1,0 +1,158 @@
+{
+  "scenario": "中国—东盟人工智能标准适配验证台",
+  "synthetic": true,
+  "records": [
+    {
+      "record_id": "adaptation_case-001",
+      "payload": {
+        "target_market": "target_market-0",
+        "standard_family": "standard_family-1",
+        "schema_version": "schema_version-2",
+        "unit_system": "unit_system-3",
+        "language_pack": "language_pack-4",
+        "privacy_tier": 21.5,
+        "safety_threshold": 23.4,
+        "evidence_items": 25.3,
+        "unmapped_fields": 27.2,
+        "waiver_count": 29.1,
+        "test_pass_rate": 0.58,
+        "local_partner": "local_partner-1"
+      },
+      "state": "profiled",
+      "source": "synthetic-local-acceptance"
+    },
+    {
+      "record_id": "adaptation_case-002",
+      "payload": {
+        "target_market": "target_market-1",
+        "standard_family": "standard_family-2",
+        "schema_version": "schema_version-3",
+        "unit_system": "unit_system-4",
+        "language_pack": "language_pack-0",
+        "privacy_tier": 25.2,
+        "safety_threshold": 27.1,
+        "evidence_items": 29.0,
+        "unmapped_fields": 30.9,
+        "waiver_count": 32.8,
+        "test_pass_rate": 0.69,
+        "local_partner": "local_partner-2"
+      },
+      "state": "profiled",
+      "source": "synthetic-local-acceptance"
+    },
+    {
+      "record_id": "adaptation_case-003",
+      "payload": {
+        "target_market": "target_market-2",
+        "standard_family": "standard_family-3",
+        "schema_version": "schema_version-4",
+        "unit_system": "unit_system-0",
+        "language_pack": "language_pack-1",
+        "privacy_tier": 28.9,
+        "safety_threshold": 30.8,
+        "evidence_items": 32.7,
+        "unmapped_fields": 34.6,
+        "waiver_count": 36.5,
+        "test_pass_rate": 0.8,
+        "local_partner": "local_partner-3"
+      },
+      "state": "profiled",
+      "source": "synthetic-local-acceptance"
+    },
+    {
+      "record_id": "adaptation_case-004",
+      "payload": {
+        "target_market": "target_market-3",
+        "standard_family": "standard_family-4",
+        "schema_version": "schema_version-0",
+        "unit_system": "unit_system-1",
+        "language_pack": "language_pack-2",
+        "privacy_tier": 32.6,
+        "safety_threshold": 34.5,
+        "evidence_items": 36.4,
+        "unmapped_fields": 38.3,
+        "waiver_count": 40.2,
+        "test_pass_rate": 0.91,
+        "local_partner": "local_partner-4"
+      },
+      "state": "profiled",
+      "source": "synthetic-local-acceptance"
+    },
+    {
+      "record_id": "adaptation_case-005",
+      "payload": {
+        "target_market": "target_market-4",
+        "standard_family": "standard_family-0",
+        "schema_version": "schema_version-1",
+        "unit_system": "unit_system-2",
+        "language_pack": "language_pack-3",
+        "privacy_tier": 36.3,
+        "safety_threshold": 38.2,
+        "evidence_items": 40.1,
+        "unmapped_fields": 42.0,
+        "waiver_count": 43.9,
+        "test_pass_rate": 0.25,
+        "local_partner": "local_partner-0"
+      },
+      "state": "profiled",
+      "source": "synthetic-local-acceptance"
+    },
+    {
+      "record_id": "adaptation_case-006",
+      "payload": {
+        "target_market": "target_market-0",
+        "standard_family": "standard_family-1",
+        "schema_version": "schema_version-2",
+        "unit_system": "unit_system-3",
+        "language_pack": "language_pack-4",
+        "privacy_tier": 40.0,
+        "safety_threshold": 41.9,
+        "evidence_items": 43.8,
+        "unmapped_fields": 45.7,
+        "waiver_count": 47.6,
+        "test_pass_rate": 0.36,
+        "local_partner": "local_partner-1"
+      },
+      "state": "profiled",
+      "source": "synthetic-local-acceptance"
+    },
+    {
+      "record_id": "adaptation_case-007",
+      "payload": {
+        "target_market": "target_market-1",
+        "standard_family": "standard_family-2",
+        "schema_version": "schema_version-3",
+        "unit_system": "unit_system-4",
+        "language_pack": "language_pack-0",
+        "privacy_tier": 43.7,
+        "safety_threshold": 45.6,
+        "evidence_items": 47.5,
+        "unmapped_fields": 49.4,
+        "waiver_count": 51.3,
+        "test_pass_rate": 0.47,
+        "local_partner": "local_partner-2"
+      },
+      "state": "profiled",
+      "source": "synthetic-local-acceptance"
+    },
+    {
+      "record_id": "adaptation_case-008",
+      "payload": {
+        "target_market": "target_market-2",
+        "standard_family": "standard_family-3",
+        "schema_version": "schema_version-4",
+        "unit_system": "unit_system-0",
+        "language_pack": "language_pack-1",
+        "privacy_tier": 47.4,
+        "safety_threshold": 49.3,
+        "evidence_items": 51.2,
+        "unmapped_fields": 53.1,
+        "waiver_count": 55.0,
+        "test_pass_rate": 0.58,
+        "local_partner": "local_partner-3"
+      },
+      "state": "profiled",
+      "source": "synthetic-local-acceptance"
+    }
+  ]
+}
