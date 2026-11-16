@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any, Iterator, Mapping, Sequence
 
 from standards_bridge.profiles.specification import Decision, DomainRecord, ContractError, canonical_json, stable_hash, utc_now
+from standards_bridge.assurance.certification_register import prepare_certifications, register_mapping, link_case, sign_case, mapping_impact
 
 
 SCHEMA = """
@@ -83,6 +84,26 @@ class Repository:
     def initialize(self) -> None:
         with self.connect() as connection:
             connection.executescript(SCHEMA)
+            prepare_certifications(connection)
+
+    def register_mapping(self, mapping_id: str, source: str, target: str, aliases: dict[str, str]) -> int:
+        with self.transaction() as connection:
+            return register_mapping(connection, mapping_id, source, target, aliases)
+
+    def link_case_mapping(self, case_id: str, mapping_id: str) -> None:
+        with self.transaction() as connection:
+            if not connection.execute("SELECT 1 FROM records WHERE record_id=?", (case_id,)).fetchone():
+                raise ContractError("unknown case")
+            link_case(connection, case_id, mapping_id)
+
+    def sign_case(self, certification_id: str, case_id: str, mapping_id: str,
+                  evidence: dict[str, Any]) -> dict[str, Any]:
+        with self.transaction() as connection:
+            return sign_case(connection, certification_id, case_id, mapping_id, evidence)
+
+    def mapping_impact(self, mapping_id: str) -> dict[str, Any]:
+        with self.connect() as connection:
+            return mapping_impact(connection, mapping_id)
 
     @contextmanager
     def transaction(self) -> Iterator[sqlite3.Connection]:

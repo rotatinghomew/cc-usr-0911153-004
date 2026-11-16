@@ -65,6 +65,12 @@ class Application:
         return {"snapshot": self.repository.snapshot(), "records": [record.__dict__ for record in self.repository.list_records()],
                 "decisions": self.repository.decision_rows()}
 
+    def register_mapping(self, mapping_id: str, source: str, target: str, aliases: dict[str, str]) -> int:
+        return self.repository.register_mapping(mapping_id, source, target, aliases)
+
+    def mapping_impact(self, mapping_id: str) -> dict[str, Any]:
+        return self.repository.mapping_impact(mapping_id)
+
 
 def load_fixture(path: str | Path) -> dict[str, Any]:
     try:
