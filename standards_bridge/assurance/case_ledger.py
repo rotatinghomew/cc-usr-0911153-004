@@ -9,6 +9,12 @@ from typing import Any, Iterator, Mapping, Sequence
 
 from standards_bridge.profiles.specification import Decision, DomainRecord, ContractError, canonical_json, stable_hash, utc_now
 from standards_bridge.assurance.certification_register import prepare_certifications, register_mapping, link_case, sign_case, mapping_impact
+from standards_bridge.assurance.revision_control import (
+    complete_revalidation,
+    pending_revalidation_overview,
+    record_comparability_snapshot,
+    revision_report,
+)
 
 
 SCHEMA = """
@@ -104,6 +110,36 @@ class Repository:
     def mapping_impact(self, mapping_id: str) -> dict[str, Any]:
         with self.connect() as connection:
             return mapping_impact(connection, mapping_id)
+
+    def mapping_graph_rows(self) -> list[dict[str, Any]]:
+        with self.connect() as connection:
+            rows = connection.execute(
+                "SELECT mapping_id,source_standard,target_standard,mapping_json,revision"
+                " FROM standard_mappings ORDER BY mapping_id"
+            ).fetchall()
+        return [dict(row) | {"aliases": json.loads(row["mapping_json"])} for row in rows]
+
+    def snapshot_comparability(self, mapping_id: str, mapping_revision: int,
+                               pair_rows: list[dict[str, Any]]) -> int:
+        with self.transaction() as connection:
+            return record_comparability_snapshot(connection, mapping_id, mapping_revision, pair_rows)
+
+    def complete_case_revalidation(self, mapping_id: str, case_id: str,
+                                   result: dict[str, Any]) -> dict[str, Any]:
+        with self.transaction() as connection:
+            return complete_revalidation(connection, mapping_id, case_id, result)
+
+    def revision_report(self, mapping_id: str) -> dict[str, Any]:
+        with self.connect() as connection:
+            return revision_report(connection, mapping_id)
+
+    def pending_revalidation(self) -> dict[str, Any]:
+        with self.connect() as connection:
+            return pending_revalidation_overview(connection)
+
+    def blocked_revalidation_cases(self) -> set[str]:
+        overview = self.pending_revalidation()
+        return {case_id for case_ids in overview["by_mapping"].values() for case_id in case_ids}
 
     @contextmanager
     def transaction(self) -> Iterator[sqlite3.Connection]:

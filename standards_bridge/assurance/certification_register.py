@@ -5,6 +5,11 @@ import sqlite3
 from typing import Any
 
 from standards_bridge.profiles.specification import ContractError, canonical_json, stable_hash, utc_now
+from standards_bridge.assurance.revision_control import (
+    open_requests_for_case,
+    prepare_revision_tables,
+    queue_mapping_revision,
+)
 
 
 def prepare_certifications(connection: sqlite3.Connection) -> None:
@@ -22,8 +27,13 @@ def prepare_certifications(connection: sqlite3.Connection) -> None:
         certification_id TEXT PRIMARY KEY, case_id TEXT NOT NULL,
         mapping_id TEXT NOT NULL, mapping_revision INTEGER NOT NULL,
         evidence_hash TEXT NOT NULL, signed_at TEXT NOT NULL,
+        stale INTEGER NOT NULL DEFAULT 0,
         FOREIGN KEY(mapping_id) REFERENCES standard_mappings(mapping_id)
     )""")
+    columns = {row[1] for row in connection.execute("PRAGMA table_info(certifications)")}
+    if "stale" not in columns:
+        connection.execute("ALTER TABLE certifications ADD COLUMN stale INTEGER NOT NULL DEFAULT 0")
+    prepare_revision_tables(connection)
 
 
 def register_mapping(connection: sqlite3.Connection, mapping_id: str, source: str,
@@ -44,6 +54,7 @@ def register_mapping(connection: sqlite3.Connection, mapping_id: str, source: st
         revision = existing["revision"] + 1
         connection.execute("UPDATE standard_mappings SET mapping_json=?,revision=?,updated_at=? WHERE mapping_id=?",
                            (body, revision, utc_now(), mapping_id))
+        queue_mapping_revision(connection, mapping_id, existing["revision"], revision)
         return revision
     connection.execute("INSERT INTO standard_mappings VALUES(?,?,?,?,?,?)",
                        (mapping_id, source, target, body, 1, utc_now()))
@@ -72,8 +83,10 @@ def sign_case(connection: sqlite3.Connection, certification_id: str, case_id: st
                 case_id, mapping_id, revision, fingerprint):
             raise ContractError("signed certification cannot be overwritten")
         return dict(old)
-    connection.execute("INSERT INTO certifications VALUES(?,?,?,?,?,?)",
-                       (certification_id, case_id, mapping_id, revision, fingerprint, utc_now()))
+    if open_requests_for_case(connection, case_id):
+        raise ContractError("case has open revalidation requests; revalidate against the current mapping revision first")
+    connection.execute("INSERT INTO certifications VALUES(?,?,?,?,?,?,?)",
+                       (certification_id, case_id, mapping_id, revision, fingerprint, utc_now(), 0))
     return dict(connection.execute("SELECT * FROM certifications WHERE certification_id=?", (certification_id,)).fetchone())
 
 
@@ -86,5 +99,10 @@ def mapping_impact(connection: sqlite3.Connection, mapping_id: str) -> dict[str,
         "SELECT case_id FROM case_mapping_usage WHERE mapping_id=? ORDER BY case_id", (mapping_id,))]
     issued = [dict(item) for item in connection.execute(
         "SELECT * FROM certifications WHERE mapping_id=? ORDER BY signed_at,certification_id", (mapping_id,))]
+    open_requests = [dict(item) for item in connection.execute(
+        "SELECT queue_id,case_id,from_revision,to_revision,status,requested_at FROM mapping_revision_queue"
+        " WHERE mapping_id=? AND status IN ('pending','in_progress') ORDER BY case_id", (mapping_id,))]
     return {"mapping_id": mapping_id, "revision": row["revision"], "aliases": json.loads(row["mapping_json"]),
-            "affected_cases": cases, "signed_certifications": issued}
+            "affected_cases": cases, "signed_certifications": issued,
+            "stale_certification_ids": [item["certification_id"] for item in issued if item.get("stale")],
+            "open_revalidation_cases": [item["case_id"] for item in open_requests]}
